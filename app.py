@@ -208,7 +208,7 @@ def send_email(recipient_email, name,item):
     from pathlib import Path 
 
     
-    html_template = Path(r'C:\Users\Barcode PC\Desktop\SCAN\templates\reminderBorrowed.html').read_text()
+    html_template = Path(r'.\reminderBorrowed.html').read_text()
 
     
     html_message = Template(html_template).substitute({'name': name, 'item':item})
@@ -223,7 +223,7 @@ def send_email(recipient_email, name,item):
     with smtplib.SMTP(host='smtp.gmail.com', port=587) as smtp:
         smtp.ehlo()
         smtp.starttls()
-        smtp.login('ainfantevicon@gmail.com', 'fwgg wqdp etvc jvdf')
+        smtp.login('emailaddress', 'generated password')
         smtp.send_message(email)
     print('Email sent')
 
