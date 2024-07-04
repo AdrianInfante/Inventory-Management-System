@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 50px;
+    }
+
+    form {
+        width: 86vw;
+    height: 23vw;
+    margin: 2vw;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+    #bin {
+    width: 40%;
+    height: 171px;
+    padding: 8px;
+    margin: 10px 1px 10px; /* Use spaces, not commas */
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: large;
+    left: 1000px;
+    top: 200px;
+    font-size: 60px;
+}
+
+
+ 
+
+    #product-description {
+        width: 40%;
+    height: 10vw;
+    padding: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 60px;
+
+}
+
+
+#form-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .product-container {
+        flex: 1;
+    margin-right: 20vw;
+    left: 45vw;
+    top: -20.2vw;
+    position: relative;
+    }
+
+    .bin-container {
+        flex: 1;
+    margin-right: 20vw;
+    left: -18.9vw;
+    top: -195px;
+    position: relative;
+    }
+
+
+
+    #product-description {
+        width: 43vw;
+    }
+
+    #bin {
+        width: 43vw;
+    }
+
+
+
+    #scanned-pc {
+        font-size: 12vw;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+
+    #scanned-sn {
+        font-size: 80px;
+        flex: 1;
+        width: 80%;
+        box-sizing: border-box;
+        resize: none;
+        
+    }
+
+    #scanned-valid {
+        font-size: 80px;
+        flex: 1;
+        width: 20%;
+        resize: none;
+    }
+
+    /* Added styles */
+    #scan-sn-valid-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+        height: 60%;
+    }
+
+    .delete-button {
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+
+
+
+
+.scrollable-div {
+    height: 474px; /* Set the desired height for the div */
+    overflow-y: auto; /* Enable vertical scrolling when content overflows */
+    border: 1px solid #ccc; /* Optional: Add a border for better visualization */
+}
+
+select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #f2f2f2;
+    width: 43.8vw;
+        }
+
+    #prodlbl{
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+        left: 1025px;
+        top:441px;
+        position: absolute;
+    }
+
+    #binlbl{
+        display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    left: 1025px;
+    top: 618px;
+    position: absolute;
+    }
+    .borrow_button {
+    background-color: #ffffff;
+    color: #000000; /* Change text color to your desired color */
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    background-image: url('static/scan.png');
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: 40px 40px;
+    width: 90px;
+    height: 60px; /* Adjust the height to accommodate the text */
+    position: absolute;
+
+    display: flex; /* Use flexbox */
+    align-items: flex-end; /* Align text to the bottom */
+    justify-content: center; /* Center text horizontally */
+    text-align: center; /* Center the text horizontally */
+    top: 19px;
+    left: 1788px;
+    }
+
+    .return_button {
+    background-color: #ffffff;
+    color: #000000; /* Change text color to your desired color */
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    background-image: url('static/return.png');
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: 40px 40px;
+    width: 90px;
+    height: 60px; /* Adjust the height to accommodate the text */
+    position: absolute;
+
+    display: flex; /* Use flexbox */
+    align-items: flex-end; /* Align text to the bottom */
+    justify-content: center; /* Center text horizontally */
+    text-align: center; /* Center the text horizontally */
+    top: 19px;
+    left: 1675px;
+}
+    
+
+</style>
+<body>
+    <h1 id="product-header">Borrow parts</h1>
+    <button class="borrow_button" >
+        <span>Scan</span>
+    </button>
+    <button class="return_button" > 
+        <span>Return</span>
+    </button>
+
+    <textarea id="scanned-pc" name = "scanned-pc" rows="5" cols="40" placeholder="Product Code"></textarea>
+    
+    
+    <div id="scan-sn-valid-container">
+
+        <form action="/submit" method="post">
+            <label for="dropdown">Select borrow name:</label>
+            <select id="dropdown" name="dropdown">
+                <option value="Adrian">Adrian</option>
+                <option value="Dominic">Dominic</option>
+                <option value="Mo">Mo</option>
+                <option value="Matthew">Matthew</option>
+                <option value="Guy">Guy</option>
+                <option value="Pam">Pam</option>
+                <option value="Alison">Alison</option>
+                <option value="Robin">Robin</option>
+                <option value="Wendy">Wendy</option>
+            </select>
+            <br>
+            <label for="textbox"></label>
+            <input type="text" id="textbox" name="reason" placeholder="Reason"autocomplete="off">
+            <br>
+
+            
+
+            <input type="submit" value="Submit">
+
+            <div id="form-container">
+                <div class="product-container">
+                    <input type="text" id="product-description" name="product-description" placeholder="Product Description" autocomplete="off">
+                </div>
+                <div class="bin-container">
+                    <input type="text" id="bin" name="bin" placeholder="bin"autocomplete="off">
+                </div>
+            </div>
+
+            <input type="hidden" id="hidden-product-code" name="hidden-product-code">
+
+
+            
+        </form>
+        
+        
+        
+
+    </div>
+
+    
+
+    <script>
+
+
+// Set the idle time (in milliseconds) before redirection
+// const idleTime = 60000; // 10 seconds (adjust as needed)
+
+// let idleTimer;
+
+
+// Function to reset the idle timer
+// function resetIdleTimer() {
+//     clearTimeout(idleTimer);
+//     idleTimer = setTimeout(redirectOnIdle, idleTime);
+// }
+
+// Function to redirect the page when idle
+// function redirectOnIdle() {
+//     window.location.href = '/scan';
+// }
+
+// Initialize the idle timer
+// resetIdleTimer();
+
+// Add event listeners to reset the timer on user activity
+// window.addEventListener('mousemove', resetIdleTimer);
+// window.addEventListener('keydown', resetIdleTimer);
+// window.addEventListener('scroll', resetIdleTimer);
+        
+ 
+        // Add an event listener to the return_button
+document.querySelector('.return_button').addEventListener('click', function() {
+    // Redirect to the /returns page
+    window.location.href = '/borrow_list';
+});
+
+        // Add an event listener to the return_button
+        document.querySelector('.borrow_button').addEventListener('click', function() {
+    // Redirect to the /returns page
+    window.location.href = '/scan';
+});
+
+       
+
+        function ProductNameReset() {
+            var productDes = document.getElementById('product-description');
+            productDes.textContent = 'Product Name';
+            
+        }
+
+        
+        function simulateItemScan() {
+            itemCount++; 
+            updateItemCount(); 
+        }
+
+        function deleteItemScan() {
+            itemCount--; 
+            updateItemCount(); 
+        }
+
+        function ResetItemScan() {
+            itemCount = 0; 
+            updateItemCount(); 
+        }
+
+        window.onload = function() {
+            document.getElementById('scanned-pc').focus();
+            var scannedSN = document.getElementById('scanned-sn');
+            var scannedValid = document.getElementById('scanned-valid');
+            var scannedPC = document.getElementById('scanned-pc');
+            var scannedName = document.getElementById('product-description');
+            
+            
+            
+        scannedPC.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            var pcValue = this.value.trim();
+        
+        // Check if the product code exists in the database
+        fetch('/check_product', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product_code: pcValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                scannedPC.style.backgroundColor = 'green';
+                setTimeout(function() {
+                    scannedPC.style.backgroundColor = 'white'; // Change it back to white after 1 second
+                }, 1000); // 1000 milliseconds = 1 second
+                
+                // Update the product description input and bin input fields
+                var productDescription = document.getElementById('product-description');               
+                productDescription.value = data.description;
+
+                var hiddenProductCodeInput = document.getElementById('hidden-product-code');
+                hiddenProductCodeInput.value = data.product_code;
+
+                var binElement = document.getElementById('bin');  // Assuming you have an element with the id 'bin'
+                binElement.value = data.bin; // Set the value of the 'bin' input element
+                var form = document.querySelector('form');
+                var formData = new FormData(form);
+                formData.append('product-code', pcValue);
+
+               
+            } else {
+                // Try again by removing "1P" prefix if it exists
+                console.log("before 1P")
+                if (pcValue.startsWith('1P') && pcValue.length > 2) {
+                    console.log("enter 1P")
+                    var trimmedValue = pcValue.substring(2); // Remove "1P" prefix
+                    console.log(trimmedValue);
+                    fetch('/check_product', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            product_code: trimmedValue
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            scannedPC.style.backgroundColor = 'green';
+                            setTimeout(function() {
+                                scannedPC.style.backgroundColor = 'white'; // Change it back to white after 1 second
+                            }, 1000); // 1000 milliseconds = 1 second
+        
+                            // Update the product description element and bin element
+                            var productDescription = document.getElementById('product-description');
+                            productDescription.value = data.description;  // Use 'value' for input fields
+
+                            var binElement = document.getElementById('bin');
+                            binElement.value = data.bin;  // Use 'value' for input fields
+
+                        } else {
+                            scannedPC.value = '';
+                            scannedPC.style.backgroundColor = 'white';
+                            scannedPC.focus();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking product:', error);
+                    });
+                } else {
+                    console.log("exit 1P")
+                    scannedPC.style.backgroundColor = 'red'; // Set background color to red
+                    setTimeout(function() {
+                        scannedPC.style.backgroundColor = 'white'; // Change it back to white after 1 second
+                    }, 1000); // 1000 milliseconds = 1 second
+                    scannedPC.value = '';
+                    scannedPC.focus();
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error checking product:', error);
+        });
+
+        event.preventDefault();
+    }
+});
+
+// Assuming you have an input field with the id 'product-description'
+var productDescriptionInput = document.getElementById('product-description');
+
+productDescriptionInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        var productDescriptionValue = this.value.trim();
+
+        fetch('/get_matching_products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                description: productDescriptionValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.products.length > 0) {
+                // Calculate the center position of the screen
+                var screenWidth = window.screen.width;
+                var screenHeight = window.screen.height;
+                var windowWidth = 400; // Desired width
+                var windowHeight = 400; // Desired height
+                var left = (screenWidth - windowWidth) / 2;
+                var top = (screenHeight - windowHeight) / 2;
+
+                // Create a pop-up window with the calculated position
+                var popupWindow = window.open('', '_blank', 'width=400,height=400,scrollbars=yes,resizable=no,left=' + left + ',top=' + top);
+                popupWindow.document.title = 'Matching Products';
+                // Generate HTML for displaying matching products in the pop-up
+                var html = '<h2>Matching Parts:</h2>';
+                html += '<ul>';
+                data.products.forEach(product => {
+                    html += '<li>';
+                    html += '<strong>Product Name:</strong> <a href="javascript:void(0);" data-description="' + product.description + '">' + product.description + '</a><br>';
+                    html += '<strong>Product Code:</strong> ' + product.product_code + '<br>';
+                    html += '<strong>Bin:</strong> ' + product.bin + '<br>';
+                    html += '</li>';
+                });
+                html += '</ul';
+
+                // Write the HTML content to the pop-up window
+                popupWindow.document.write(html);
+
+                // Add event listeners to list items to handle product selection
+                popupWindow.document.querySelectorAll('li').forEach(function(item, index) {
+                    item.addEventListener('click', function() {
+                        // Populate the main form with the selected product's information
+                        var productCodeElement = document.getElementById('scanned-pc');
+                        var binElement = document.getElementById('bin');
+                        var productDescriptionElement = document.getElementById('product-description');
+                        
+                        productCodeElement.value = data.products[index].product_code;
+                        binElement.value = data.products[index].bin;
+                        productDescriptionElement.value = data.products[index].description;
+
+                        // Close the pop-up window
+                        popupWindow.close();
+                    });
+                });
+            } else {
+                // Handle the case when no matching products are found
+                console.log('No matching products found.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching matching products:', error);
+        });
+
+        event.preventDefault();
+    }
+});
+
+
+            
+
+        function saveToDatabase(productCode, bin) {
+        fetch('/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product_code: productCode,
+                bin: bin
+
+            })
+        })
+        .then(response => response.text())  // Parse the response as text
+        .then(data => {
+            console.log('Server response:', data);  // Log the response
+        })
+        .catch(error => {
+            console.error('Error saving data:', error);
+        });
+    }
+
+  
+
+
+            
+    
+
+    
+
+
+
+    function removeSerialNumber(serialNumber) {
+        // Remove the clicked serial number from the list
+        var serialNumberElement = document.getElementById(serialNumber);
+        if (serialNumberElement) {
+            serialNumberElement.parentNode.removeChild(serialNumberElement);
+            
+            // Decrease the count number and update the header
+            itemCount--;
+            updateItemCount();
+            scannedSN.focus();
+        }
+    }
+
+    // Add an event listener for clicks on the scannedValid textarea
+    document.getElementById('scannedValid').addEventListener('click', function(event) {
+    if (event.target.tagName === 'BUTTON') {
+        // Get the clicked serial number
+        var snValue = event.target.textContent.trim();
+        var clickedSN = event.target.textContent.trim();
+        
+        // Remove the clicked serial number from the textarea
+        var serialNumbers = this.value.trim().split('\n');
+        var updatedSerialNumbers = serialNumbers.filter(function(serial) {
+            return serial !== clickedSN;
+        });
+
+        // Update the textarea value
+        this.value = updatedSerialNumbers.join('\n');
+        
+    }
+});
+
+// Function to generate a delete button for a product code
+function generateDeleteButton(snValue) {
+    const productContainer = document.createElement('div');
+    productContainer.innerHTML = `${snValue} <button class="delete-button" data-sn="${snValue}">Delete</button>`;
+    scannedValid.appendChild(productContainer);
+    
+}
+
+
+    };
+
+// Function to update hidden input fields when labels change
+function updateHiddenFields() {
+        const productDescriptionLabel = document.getElementById('product-description');
+        const binLabel = document.getElementById('bin');
+        const productDescriptionInput = document.getElementById('product-description-input');
+        const binInput = document.getElementById('bin-input');
+
+        productDescriptionInput.value = productDescriptionLabel.textContent;
+        binInput.value = binLabel.textContent;
+    }
+
+    // Add event listeners to labels to trigger the update
+    document.getElementById('product-description').addEventListener('change', updateHiddenFields);
+    document.getElementById('bin').addEventListener('change', updateHiddenFields);
+
+    // Call the update function initially to set the initial values
+    updateHiddenFields();
+    
+    </script>
+    
+    
+    
+    
+</body>
+</html>

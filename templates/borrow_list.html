@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    /* Style for the export button */
+    #export-button {
+        background-color: #2d9603;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    #export-button:hover {
+        background-color: #0056b3;
+    }
+
+
+      /* Style for the "Return" button */
+      .return-button {
+        background-color: #ff5733; /* Choose a suitable background color */
+        color: #fff; /* Text color */
+        padding: 5px 10px; /* Adjust padding as needed */
+        border: none;
+        border-radius: 3px; /* Rounded corners */
+        cursor: pointer;
+        font-size: 14px; /* Adjust font size as needed */
+        transition: background-color 0.3s ease; /* Add a smooth hover effect */
+    }
+
+    .return-button:hover {
+        background-color: #e6411f; /* Change the background color on hover */
+    }
+
+
+
+    .borrow_button {
+    background-color: #ffffff;
+    color: #000000; /* Change text color to your desired color */
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    background-image: url('static/scan.png');
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: 40px 40px;
+    width: 90px;
+    height: 60px; /* Adjust the height to accommodate the text */
+    position: absolute;
+
+    display: flex; /* Use flexbox */
+    align-items: flex-end; /* Align text to the bottom */
+    justify-content: center; /* Center text horizontally */
+    text-align: center; /* Center the text horizontally */
+    top: 19px;
+    left: 1788px;
+    }
+</style>
+</head>
+<body>
+    <h1>Borrow items pending</h1>
+    <button id="export-button">Export to CSV</button>
+    <button id="outstanding-button">Send Emails to Outstanding Borrowers</button>
+    <button class="borrow_button" >
+        <span>Scan</span>
+    </button>
+
+    
+    <table>
+        <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>Part Code</th>
+            <th>Part Number</th>
+            
+            <th>Bin</th>
+            
+            <th>Date Borrowed</th>
+            <th>Date Returned</th>
+            <th>Status</th>
+            <th>Reason</th>
+        </tr>
+        {% for row in data %}
+        {% if not row[7] or row[7] == "None" %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[5] }}</td>
+            <td>{{ row[1] }}</td> <!-- PartCode -->
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            
+            <td>{{ row[6] }}</td>
+            <td>{{ row[7] }}</td>
+            <td>
+                {% if not row[7] %}
+                    <button class="return-button" data-id="{{ row[0] }}">Return</button> <!-- Add a "Return" button -->
+                    
+                {% endif %}
+            </td>
+            <td>{{ row[4] }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+
+    <script>
+
+        // Add event listener to outstanding-button
+$("#outstanding-button").on("click", function() {
+    $.ajax({
+        url: "/get_outstanding_borrowers2",
+        method: "GET",
+        success: function(response) {
+            alert("Emails sent to outstanding borrowers.");
+        },
+        error: function() {
+            alert("Failed to send emails to outstanding borrowers.");
+        }
+    });
+});
+
+
+// Set the idle time (in milliseconds) before redirection
+const idleTime = 10000; // 30 seconds (adjust as needed)
+
+let idleTimer;
+
+// Function to reset the idle timer
+function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(redirectOnIdle, idleTime);
+}
+
+// Function to redirect the page when idle
+function redirectOnIdle() {
+    window.location.href = '/borrow';
+}
+
+// Initialize the idle timer
+resetIdleTimer();
+
+// Add event listeners to reset the timer on user activity
+window.addEventListener('mousemove', resetIdleTimer);
+window.addEventListener('keydown', resetIdleTimer);
+window.addEventListener('scroll', resetIdleTimer);
+
+
+
+
+
+
+
+
+
+                // Add an event listener to the return_button
+                document.querySelector('.borrow_button').addEventListener('click', function() {
+    // Redirect to the /returns page
+    window.location.href = '/borrow';
+});
+
+
+ // Handle "Return" button click
+ $(".return-button").on("click", function() {
+        var button = $(this);
+        var rowId = button.data("id");
+
+        // Send an AJAX request to update the "Date Returned" column
+        $.ajax({
+            url: "/return_item",
+            method: "POST",
+            data: { row_id: rowId },
+            success: function(response) {
+                if (response.status === "success") {
+                    // Update the Date Returned column with the current date and time
+                    var currentDate = new Date().toLocaleString();
+                    //button.closest("tr").find(".date-returned").text(currentDate);
+                    button.remove(); // Remove the "Return" button
+                    location.reload(); 
+                } else {
+                    alert("Failed to update the return date.");
+                }
+            },
+            error: function() {
+                alert("Failed to update the return date. Please try again later.");
+            }
+        });
+    });
+    
+            // Function to convert table data to CSV format
+            function convertToCSV(table) {
+                var rows = table.find('tr:has(td),tr:has(th)');
+                var csvData = [];
+                rows.each(function(index, row) {
+                    var rowData = [];
+                    $(row).find('td, th').each(function(index, column) {
+                        rowData.push('"' + $(column).text() + '"');
+                    });
+                    csvData.push(rowData.join(','));
+                });
+                return csvData.join('\n');
+            }
+    
+            // Handle export button click
+            $("#export-button").on("click", function() {
+                var table = $("table");
+                var csvData = convertToCSV(table);
+                var blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+                var link = document.createElement("a");
+                var url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "data.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        
+    </script>
+    
+</body>
+</html>
