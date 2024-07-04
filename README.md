@@ -2,6 +2,10 @@
 
 This project is a web-based Inventory Management System built using Flask, SQLite, and Pandas. It allows users to upload product data, manage borrowing and returning of items, and send email reminders for outstanding borrowed items.
 
+## Incoming updates
+
+- Scanning part for a delivery order
+
 ## Features
 
 - **Borrow and Return Items**: Record borrowing and returning of items.
